@@ -47,7 +47,7 @@
       "./index.ts"
     ],
     "changelogPath": "./CHANGELOG.md",
-    "image": "./assets/banner-v3.png"
+    "image": "./assets/banner-v4.png"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",

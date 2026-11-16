@@ -3,7 +3,7 @@
 [English](README.md) · [Español](README.es.md)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v3.png" alt="πrsonal Sidebar" width="100%">
+  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v4.png" alt="πrsonal Sidebar" width="100%">
 </p>
 
 <p align="center">
