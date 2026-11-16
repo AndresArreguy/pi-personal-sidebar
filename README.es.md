@@ -3,7 +3,7 @@
 [Español](README.es.md) · [English](README.md)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v4.png" alt="πrsonal Sidebar" width="100%">
+  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v5.png" alt="πrsonal Sidebar" width="100%">
 </p>
 
 <p align="center">
@@ -13,6 +13,8 @@
 </p>
 
 > ⭐ Si esta sidebar te sirve, [dejale una estrella al repo](https://github.com/AndresArreguy/pi-personal-sidebar). Ayuda a que otras personas de Pi lo encuentren.
+
+[![Pi package](https://img.shields.io/badge/Pi-package-8A2BE2)](https://pi.dev/packages)
 
 Un **dashboard lateral derecho para Pi que sigue el theme activo**: repositorio,
 tareas, uso de Command Code, subagentes corriendo y limpieza del cache de npm,
@@ -26,7 +28,7 @@ transcript, el editor y el footer se reacomodan al ancho restante.
 ┌────────────────────────────────┬──────────────────────┐
 │ chat / transcript / editor     │ ▾ Repo / Carpeta     │
 │                                │ ▾ To-do              │
-│                                │ ▾ Command Code       │
+│                                │ ▾ Sub usage       │
 │                                │ ▾ Subagentes         │
 │                                │ ▾ NPM cache          │
 └────────────────────────────────┴──────────────────────┘
@@ -38,8 +40,9 @@ transcript, el editor y el footer se reacomodan al ancho restante.
   y ruta local.
 - **To-do** — tareas de [`rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo).
   Su overlay propio se oculta para que la lista aparezca una sola vez.
-- **Command Code** — ventanas de 5 horas y semanal, créditos mensuales
-  restantes, modelo y thinking actuales. Refresca cada 60 segundos.
+- **Sub usage** — barras de progreso para la cuota de 5 horas y semanal, uso
+  del context window, tokens y costo de la sesión, más modelo y thinking
+  actuales. La cuota refresca cada 60s; contexto/tokens cada 2s.
 - **Subagentes** — llamadas activas a `run_agent` con agente, preview de la task
   y tiempo transcurrido.
 - **NPM cache** — `[ Limpiar cache NPM ]` ejecuta `npm cache clean --force` y,
@@ -55,7 +58,8 @@ transcript, el editor y el footer se reacomodan al ancho restante.
 - Node.js **22.6+**.
 - Opcional: `@juicesharp/rpiv-todo` para la sección To-do.
 - Opcional: login del provider `commandcode` (o `COMMAND_CODE_API_KEY` /
-  `COMMANDCODE_API_KEY`) para el uso.
+  `COMMANDCODE_API_KEY`) para las barras de cuota. Otros providers igual muestran
+  contexto, tokens, modelo y thinking.
 
 ## Instalación
 
@@ -68,7 +72,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Fijado a un tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.0.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.1.0
 ```
 
 Desde un clon local:
@@ -131,6 +135,7 @@ personalizado se aplica automáticamente.
 | Texto | `text` |
 | Porcentajes y nombres de agentes | `mdCode` |
 | Fila seleccionada/enfocada | `selectedBg` |
+| Barras de progreso | `success` / `warning` / `error` según porcentaje |
 | Iconos de tareas | `success`, `accent`, `dim` |
 | Errores | `warning` |
 
@@ -199,7 +204,8 @@ Después editá `index.ts`, `i18n.ts` o `quota.ts` y corré `/reload` en Pi.
   cambia la API de fullscreen, puede requerir una actualización.
 - El progreso de subagentes es agente + task + tiempo. `run_agent` no streamea la
   salida del hijo.
-- El usage depende de la API de Command Code y del plan de la cuenta.
+- Las barras de cuota dependen de la API de Command Code y del plan de la
+  cuenta. Otros providers igual muestran contexto, tokens, modelo y thinking.
 
 ## ⭐ Apoyo
 
@@ -208,6 +214,10 @@ Si esta sidebar te sirve, dejale una estrella al repo. Ayuda a que otras persona
 [![GitHub stars](https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social)](https://github.com/AndresArreguy/pi-personal-sidebar/stargazers)
 
 Issues y pull requests son bienvenidos.
+
+## Créditos
+
+Construido sobre [Pi](https://github.com/earendil-works/pi) por el equipo de Pi.
 
 ## Licencia
 

@@ -3,7 +3,7 @@
 [English](README.md) · [Español](README.es.md)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v4.png" alt="πrsonal Sidebar" width="100%">
+  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v5.png" alt="πrsonal Sidebar" width="100%">
 </p>
 
 <p align="center">
@@ -13,6 +13,8 @@
 </p>
 
 > ⭐ If this sidebar is useful, please [star the repo](https://github.com/AndresArreguy/pi-personal-sidebar). It helps other Pi users find it.
+
+[![Pi package](https://img.shields.io/badge/Pi-package-8A2BE2)](https://pi.dev/packages)
 
 A **theme-aware right-side dashboard for Pi**: repository, todos, Command Code
 usage, running subagents and one-click npm cache cleanup — without covering the
@@ -26,7 +28,7 @@ and footer reflow into the remaining width.
 ┌────────────────────────────────┬──────────────────────┐
 │ chat / transcript / editor     │ ▾ Repo / Folder      │
 │                                │ ▾ To-do              │
-│                                │ ▾ Command Code       │
+│                                │ ▾ Sub usage       │
 │                                │ ▾ Subagents          │
 │                                │ ▾ NPM cache          │
 └────────────────────────────────┴──────────────────────┘
@@ -36,7 +38,7 @@ and footer reflow into the remaining width.
 
 - **Repo / Folder** — repository name, branch, dirty file count and local path.
 - **To-do** — tasks from [`rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo). Its own overlay is hidden so the list only appears once.
-- **Command Code** — 5-hour and weekly usage windows, monthly credits left, current model and thinking level. Refreshes every 60 seconds.
+- **Sub usage** — progress bars for the 5-hour and weekly quota, context-window usage, session token totals and cost, plus the current model and thinking level. Quota refreshes every 60s; context/tokens every 2s.
 - **Subagents** — active `run_agent` calls with agent name, task preview and elapsed time.
 - **NPM cache** — `[ Clear NPM cache ]` runs `npm cache clean --force` and, when available, `pnpm store prune`. A confirmation dialog is always shown.
 - **Collapsible sections** — bold titles with `▾ / ▸`. Click a title with the mouse, or focus the panel and use the keyboard.
@@ -49,7 +51,8 @@ and footer reflow into the remaining width.
 - Node.js **22.6+**.
 - Optional: `@juicesharp/rpiv-todo` for the To-do section.
 - Optional: a `commandcode` provider login (or `COMMAND_CODE_API_KEY` /
-  `COMMANDCODE_API_KEY`) for usage data.
+  `COMMANDCODE_API_KEY`) for the quota bars. Other providers still show
+  context, tokens, model and thinking.
 
 ## Install
 
@@ -62,7 +65,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Pinned to a tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.0.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.1.0
 ```
 
 From a local clone:
@@ -125,6 +128,7 @@ automatically applies to it.
 | Body text | `text` |
 | Percentages and agent names | `mdCode` |
 | Selected/focused row | `selectedBg` |
+| Progress bars | `success` / `warning` / `error` by percentage |
 | Todo icons | `success`, `accent`, `dim` |
 | Errors | `warning` |
 
@@ -194,7 +198,8 @@ Then edit `index.ts`, `i18n.ts` or `quota.ts` and run `/reload` in Pi.
   changes the fullscreen layout API may require an update.
 - Subagent progress is agent + task + elapsed time. Live child output is not
   streamed by `run_agent`.
-- Usage depends on the Command Code API and the current account plan.
+- Quota bars depend on the Command Code API and the current account plan. Other
+  providers still show context, tokens, model and thinking.
 
 ## ⭐ Support
 
@@ -203,6 +208,10 @@ If this sidebar is useful, please star the repo. It helps other Pi users find it
 [![GitHub stars](https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social)](https://github.com/AndresArreguy/pi-personal-sidebar/stargazers)
 
 Issues and pull requests are welcome.
+
+## Credits
+
+Built on [Pi](https://github.com/earendil-works/pi) by the Pi team.
 
 ## License
 

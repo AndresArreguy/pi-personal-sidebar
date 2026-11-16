@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-11-16
+
+- **Sub usage**: progress bars for the 5h/weekly quota, context-window usage, session token totals and cost.
+- The section is provider-agnostic; quota bars are shown when the session uses Command Code, other providers still get context/tokens/model/thinking.
+- Context and session stats refresh every 2 seconds and on message/agent events.
+- README: Pi package badge and Credits section.
+
 ## [1.0.0] - 2026-11-16
 
 - Initial public release.

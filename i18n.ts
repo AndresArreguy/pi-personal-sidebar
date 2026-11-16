@@ -17,7 +17,7 @@ export function isSidebarLanguage(value: unknown): value is SidebarLanguage {
 const es = {
   "section.git": "Repo / Carpeta",
   "section.todo": "To-do",
-  "section.usage": "Command Code",
+  "section.usage": "Sub usage",
   "section.agents": "Subagentes",
   "section.cache": "NPM cache",
 
@@ -28,6 +28,9 @@ const es = {
   "label.left": "left",
   "label.model": "model:",
   "label.thinking": "thinking:",
+  "label.context": "ctx",
+  "label.tokens": "tok",
+  "label.cost": "cost",
 
   "value.loading": "cargando…",
   "value.noGit": "(no git)",
@@ -40,6 +43,7 @@ const es = {
   "value.na": "n/d",
   "value.noCredentials": "sin credenciales",
   "value.cleaning": "limpiando…",
+  "value.quotaUnsupported": "quota n/a (solo commandcode)",
 
   "action.clearCache": "[ Limpiar cache NPM ]",
   "cache.hint": "npm cache clean · pnpm store prune",
@@ -80,7 +84,7 @@ export type Translator = (key: SidebarStringKey, vars?: Record<string, string | 
 const en: Record<SidebarStringKey, string> = {
   "section.git": "Repo / Folder",
   "section.todo": "To-do",
-  "section.usage": "Command Code",
+  "section.usage": "Sub usage",
   "section.agents": "Subagents",
   "section.cache": "NPM cache",
 
@@ -91,6 +95,9 @@ const en: Record<SidebarStringKey, string> = {
   "label.left": "left",
   "label.model": "model:",
   "label.thinking": "thinking:",
+  "label.context": "ctx",
+  "label.tokens": "tok",
+  "label.cost": "cost",
 
   "value.loading": "loading…",
   "value.noGit": "(no git)",
@@ -103,6 +110,7 @@ const en: Record<SidebarStringKey, string> = {
   "value.na": "n/a",
   "value.noCredentials": "no credentials",
   "value.cleaning": "cleaning…",
+  "value.quotaUnsupported": "quota n/a (commandcode only)",
 
   "action.clearCache": "[ Clear NPM cache ]",
   "cache.hint": "npm cache clean · pnpm store prune",

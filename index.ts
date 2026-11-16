@@ -78,6 +78,20 @@ interface UsageData {
   updatedAt: number;
 }
 
+interface SessionUsage {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+  cost: number;
+}
+
+interface ContextSnapshot {
+  tokens: number | null;
+  contextWindow: number;
+  percent: number | null;
+}
+
 interface AgentRun {
   id: string;
   agent: string;
@@ -92,6 +106,9 @@ interface SidebarState {
   git: GitInfo | null;
   todos: TodoTask[];
   usage: UsageData;
+  provider: string;
+  sessionUsage: SessionUsage;
+  contextUsage: ContextSnapshot | null;
   agents: Map<string, AgentRun>;
   model: string;
   thinking: string;
@@ -176,6 +193,29 @@ function formatMoney(value: number | null, fallback = "n/d"): string {
   if (value === null || !Number.isFinite(value)) return fallback;
   if (Number.isInteger(value)) return value.toLocaleString();
   return value.toFixed(Math.abs(value) >= 10 ? 1 : 2);
+}
+
+function emptySessionUsage(): SessionUsage {
+  return { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0 };
+}
+
+function addSessionUsage(totals: SessionUsage, usage: any): void {
+  if (!usage) return;
+  totals.input += Number(usage.input || 0);
+  totals.output += Number(usage.output || 0);
+  totals.cacheRead += Number(usage.cacheRead || 0);
+  totals.cacheWrite += Number(usage.cacheWrite || 0);
+  totals.cost += typeof usage.cost === "number" ? usage.cost : Number(usage.cost?.total || 0);
+}
+
+function formatTokens(count: number): string {
+  if (!Number.isFinite(count) || count <= 0) return "0";
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
+  if (count >= 1_000) {
+    const rounded = Math.round((count / 1_000) * 10) / 10;
+    return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}k`;
+  }
+  return String(Math.round(count));
 }
 
 function elapsed(startedAt: number, now = Date.now()): string {
@@ -287,15 +327,24 @@ export class PersonalSidebar implements Component {
     }
     body.push("");
 
-    // Command Code usage
+    // Sub usage: quota, context window and session tokens
     this.pushTitle(body, "usage", this.state.t("section.usage"));
     if (!this.isCollapsed("usage")) {
       const usage = this.state.usage;
-      if (usage.error) {
-        this.pushBody(body, this.theme.fg("warning", `${this.state.t("value.na")} (${usage.error === "no-credentials" ? this.state.t("value.noCredentials") : usage.error})`));
+      const barWidth = Math.max(6, Math.min(12, valueWidth - 14));
+      if (usage.error === "not-commandcode") {
+        this.pushBody(body, white(this.state.t("value.quotaUnsupported")));
+      } else if (usage.error) {
+        this.pushBody(
+          body,
+          this.theme.fg(
+            "warning",
+            `${this.state.t("value.na")} (${usage.error === "no-credentials" ? this.state.t("value.noCredentials") : usage.error})`,
+          ),
+        );
       } else if (usage.snapshot) {
-        this.pushBody(body, this.formatWindow("5h", usage.snapshot.fiveHour));
-        this.pushBody(body, this.formatWindow("7d", usage.snapshot.weekly));
+        this.pushBody(body, this.formatWindow("5h", usage.snapshot.fiveHour, barWidth));
+        this.pushBody(body, this.formatWindow("7d", usage.snapshot.weekly, barWidth));
         const month = usage.snapshot.monthlyRemaining;
         this.pushBody(
           body,
@@ -304,6 +353,34 @@ export class PersonalSidebar implements Component {
       } else {
         this.pushBody(body, white(this.state.t("value.loading")));
       }
+
+      const context = this.state.contextUsage;
+      if (context && context.percent !== null) {
+        const percent = clamp(Math.round(context.percent), 0, 100);
+        this.pushBody(
+          body,
+          `${white(`${this.state.t("label.context")}:`)} ${this.bar(percent, barWidth)} ${orange(`${percent}%`)} ${white(`${formatTokens(context.tokens ?? 0)}/${formatTokens(context.contextWindow)}`)}`,
+        );
+      } else {
+        this.pushBody(body, `${white(`${this.state.t("label.context")}:`)} ${white(this.state.t("value.na"))}`);
+      }
+
+      const totals = this.state.sessionUsage;
+      const tokenTotal = totals.input + totals.output + totals.cacheRead + totals.cacheWrite;
+      if (tokenTotal > 0) {
+        const parts: string[] = [];
+        if (totals.input > 0) parts.push(`↑${formatTokens(totals.input)}`);
+        if (totals.output > 0) parts.push(`↓${formatTokens(totals.output)}`);
+        if (totals.cacheRead > 0) parts.push(`R${formatTokens(totals.cacheRead)}`);
+        if (totals.cacheWrite > 0) parts.push(`W${formatTokens(totals.cacheWrite)}`);
+        this.pushBody(body, `${white(`${this.state.t("label.tokens")}:`)} ${white(parts.join(" "))}`);
+      } else {
+        this.pushBody(body, `${white(`${this.state.t("label.tokens")}:`)} ${white(this.state.t("value.na"))}`);
+      }
+      if (totals.cost > 0) {
+        this.pushBody(body, `${white(`${this.state.t("label.cost")}:`)} ${orange(`$${totals.cost.toFixed(3)}`)}`);
+      }
+
       this.pushBody(body, `${white(this.state.t("label.model"))} ${white(shortModel(this.state.model || this.state.t("value.na"), prefixedWidth))}`);
       this.pushBody(body, `${white(this.state.t("label.thinking"))} ${white(this.state.thinking || "off")}`);
     }
@@ -349,13 +426,24 @@ export class PersonalSidebar implements Component {
     return body;
   }
 
-  private formatWindow(label: string, window: { used: number; cap: number; resetAt: number | null } | null): string {
+  private bar(percent: number, width: number): string {
+    const safe = clamp(percent, 0, 100);
+    const filled = Math.round((safe / 100) * width);
+    const color = safe >= 90 ? "error" : safe >= 70 ? "warning" : "success";
+    return this.theme.fg(color, "█".repeat(filled)) + this.theme.fg("dim", "░".repeat(Math.max(0, width - filled)));
+  }
+
+  private formatWindow(
+    label: string,
+    window: { used: number; cap: number; resetAt: number | null } | null,
+    barWidth: number,
+  ): string {
     const white = (text: string) => this.theme.fg("text", text);
     const orange = (text: string) => this.theme.fg("mdCode", text);
     if (!window || window.cap <= 0) return `${white(`${label}:`)} ${white(this.state.t("value.na"))}`;
     const percent = clamp(Math.round((window.used / window.cap) * 100), 0, 100);
     const reset = formatClock(window.resetAt);
-    return `${white(`${label}:`)} ${orange(`${percent}%`)}${reset ? white(` ↻${reset}`) : ""}${percent >= 100 ? this.theme.fg("warning", " ⚠") : ""}`;
+    return `${white(`${label}:`)} ${this.bar(percent, barWidth)} ${orange(`${percent}%`)}${reset ? white(` ↻${reset}`) : ""}${percent >= 100 ? this.theme.fg("warning", " ⚠") : ""}`;
   }
 
   render(width: number): string[] {
@@ -500,6 +588,9 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
     git: null,
     todos: [],
     usage: { snapshot: null, updatedAt: 0 },
+    provider: "",
+    sessionUsage: emptySessionUsage(),
+    contextUsage: null,
     agents: new Map(),
     model: "",
     thinking: "",
@@ -529,6 +620,7 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
   let timer: ReturnType<typeof setInterval> | null = null;
   let lastGit = 0;
   let lastQuota = 0;
+  let lastSessionStats = 0;
   let lastTodoHide = 0;
   let gitInFlight = false;
   let quotaInFlight = false;
@@ -635,8 +727,38 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
     const model = ctx.model;
     const provider = (model as { provider?: string } | undefined)?.provider ?? "";
     const id = (model as { id?: string } | undefined)?.id ?? "";
+    state.provider = provider;
     state.model = provider && id ? `${provider}/${id}` : id || "";
     state.thinking = ctx.thinkingLevel ?? "off";
+  };
+
+  const refreshSessionStats = (ctx: ExtensionContext) => {
+    const totals = emptySessionUsage();
+    try {
+      const entries = ctx.sessionManager?.getEntries?.() ?? [];
+      for (const entry of entries) {
+        const item = entry as any;
+        if (item?.type === "message" && item.message?.role === "assistant") {
+          addSessionUsage(totals, item.message.usage);
+        } else if (item?.type === "usage") {
+          addSessionUsage(totals, item.usage);
+        } else if (item?.type === "message" && item.message?.role === "toolResult" && item.message.usage) {
+          addSessionUsage(totals, item.message.usage);
+        } else if ((item?.type === "branch_summary" || item?.type === "compaction") && item.usage) {
+          addSessionUsage(totals, item.usage);
+        }
+      }
+    } catch {}
+    state.sessionUsage = totals;
+    try {
+      const context = ctx.getContextUsage?.();
+      state.contextUsage = context
+        ? { tokens: context.tokens, contextWindow: context.contextWindow, percent: context.percent }
+        : null;
+    } catch {
+      state.contextUsage = null;
+    }
+    requestRender();
   };
 
   const refreshGit = async (ctx: ExtensionContext) => {
@@ -694,6 +816,12 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
 
   const refreshUsage = async (ctx: ExtensionContext) => {
     if (quotaInFlight) return;
+    const provider = state.provider || (ctx.model as { provider?: string } | undefined)?.provider || "";
+    if (provider && provider !== "commandcode") {
+      state.usage = { snapshot: null, error: "not-commandcode", updatedAt: Date.now() };
+      requestRender();
+      return;
+    }
     quotaInFlight = true;
     try {
       const apiKey = await resolveApiKey(ctx);
@@ -784,6 +912,10 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
         lastQuota = now;
         void refreshUsage(ctx);
       }
+      if (now - lastSessionStats > 2000) {
+        lastSessionStats = now;
+        refreshSessionStats(ctx);
+      }
       if (now - lastTodoHide > TODO_HIDE_MS) {
         lastTodoHide = now;
         hideRpiTodo(ctx);
@@ -803,8 +935,10 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
     ref.ctx = ctx;
     updateModel(ctx);
     refreshTodos(ctx);
+    refreshSessionStats(ctx);
     lastGit = 0;
     lastQuota = 0;
+    lastSessionStats = 0;
     lastTodoHide = 0;
     void refreshGit(ctx);
     void refreshUsage(ctx);
@@ -859,6 +993,7 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
   pi.on("model_select", (_event, ctx) => {
     updateModel(ctx);
     requestRender();
+    void refreshUsage(ctx);
   });
 
   pi.on("thinking_level_select", (_event, ctx) => {
@@ -893,12 +1028,22 @@ export default function personalSidebarExtension(pi: ExtensionAPI): void {
     hideRpiTodo(ctx);
   });
 
+  pi.on("message_end", (_event, ctx) => {
+    refreshSessionStats(ctx);
+  });
+
+  pi.on("agent_settled", (_event, ctx) => {
+    refreshSessionStats(ctx);
+  });
+
   pi.on("session_compact", (_event, ctx) => {
     refreshTodos(ctx);
+    refreshSessionStats(ctx);
   });
 
   pi.on("session_tree", (_event, ctx) => {
     refreshTodos(ctx);
+    refreshSessionStats(ctx);
   });
 
   pi.registerCommand("sidebar", {
