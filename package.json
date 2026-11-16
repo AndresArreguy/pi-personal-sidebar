@@ -1,0 +1,62 @@
+{
+  "name": "pi-personal-sidebar",
+  "version": "1.0.0",
+  "description": "Theme-aware right-side dashboard for Pi: repo, todos, Command Code usage, running subagents and npm cache.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "sidebar",
+    "tui",
+    "commandcode",
+    "todo",
+    "subagents",
+    "theme"
+  ],
+  "author": {
+    "name": "Andres Arreguy",
+    "url": "https://github.com/AndresArreguy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndresArreguy/pi-personal-sidebar.git"
+  },
+  "homepage": "https://github.com/AndresArreguy/pi-personal-sidebar#readme",
+  "bugs": {
+    "url": "https://github.com/AndresArreguy/pi-personal-sidebar/issues"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "files": [
+    "index.ts",
+    "i18n.ts",
+    "quota.ts",
+    "README.md",
+    "README.es.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --experimental-strip-types --check index.ts && node --experimental-strip-types --check i18n.ts && node --experimental-strip-types --check quota.ts"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "changelogPath": "./CHANGELOG.md"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    }
+  }
+}
