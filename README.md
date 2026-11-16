@@ -1,5 +1,19 @@
 # pi-personal-sidebar
 
+[English](README.md) · [Español](README.es.md)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v3.png" alt="πrsonal Sidebar" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/AndresArreguy/pi-personal-sidebar/stargazers">
+    <img src="https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social" alt="GitHub stars">
+  </a>
+</p>
+
+> ⭐ If this sidebar is useful, please [star the repo](https://github.com/AndresArreguy/pi-personal-sidebar). It helps other Pi users find it.
+
 A **theme-aware right-side dashboard for Pi**: repository, todos, Command Code
 usage, running subagents and one-click npm cache cleanup — without covering the
 chat.
@@ -181,6 +195,14 @@ Then edit `index.ts`, `i18n.ts` or `quota.ts` and run `/reload` in Pi.
 - Subagent progress is agent + task + elapsed time. Live child output is not
   streamed by `run_agent`.
 - Usage depends on the Command Code API and the current account plan.
+
+## ⭐ Support
+
+If this sidebar is useful, please star the repo. It helps other Pi users find it.
+
+[![GitHub stars](https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social)](https://github.com/AndresArreguy/pi-personal-sidebar/stargazers)
+
+Issues and pull requests are welcome.
 
 ## License
 

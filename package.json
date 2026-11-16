@@ -30,6 +30,7 @@
     "node": ">=22.6.0"
   },
   "files": [
+    "assets/",
     "index.ts",
     "i18n.ts",
     "quota.ts",
@@ -45,7 +46,8 @@
     "extensions": [
       "./index.ts"
     ],
-    "changelogPath": "./CHANGELOG.md"
+    "changelogPath": "./CHANGELOG.md",
+    "image": "./assets/banner-v3.png"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",

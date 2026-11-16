@@ -1,5 +1,19 @@
 # pi-personal-sidebar
 
+[Español](README.es.md) · [English](README.md)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/AndresArreguy/pi-personal-sidebar/main/assets/banner-v3.png" alt="πrsonal Sidebar" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/AndresArreguy/pi-personal-sidebar/stargazers">
+    <img src="https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social" alt="GitHub stars">
+  </a>
+</p>
+
+> ⭐ Si esta sidebar te sirve, [dejale una estrella al repo](https://github.com/AndresArreguy/pi-personal-sidebar). Ayuda a que otras personas de Pi lo encuentren.
+
 Un **dashboard lateral derecho para Pi que sigue el theme activo**: repositorio,
 tareas, uso de Command Code, subagentes corriendo y limpieza del cache de npm,
 sin tapar el chat.
@@ -186,6 +200,14 @@ Después editá `index.ts`, `i18n.ts` o `quota.ts` y corré `/reload` en Pi.
 - El progreso de subagentes es agente + task + tiempo. `run_agent` no streamea la
   salida del hijo.
 - El usage depende de la API de Command Code y del plan de la cuenta.
+
+## ⭐ Apoyo
+
+Si esta sidebar te sirve, dejale una estrella al repo. Ayuda a que otras personas de Pi lo encuentren.
+
+[![GitHub stars](https://img.shields.io/github/stars/AndresArreguy/pi-personal-sidebar?style=social)](https://github.com/AndresArreguy/pi-personal-sidebar/stargazers)
+
+Issues y pull requests son bienvenidos.
 
 ## Licencia
 
