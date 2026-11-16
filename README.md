@@ -201,6 +201,10 @@ Then edit `index.ts`, `i18n.ts` or `quota.ts` and run `/reload` in Pi.
 - Quota bars depend on the Command Code API and the current account plan. Other
   providers still show context, tokens, model and thinking.
 
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Issues and PRs can be in English or Spanish. Security reports: [SECURITY.md](SECURITY.md).
+
 ## ⭐ Support
 
 If this sidebar is useful, please star the repo. It helps other Pi users find it.

@@ -207,6 +207,10 @@ Después editá `index.ts`, `i18n.ts` o `quota.ts` y corré `/reload` en Pi.
 - Las barras de cuota dependen de la API de Command Code y del plan de la
   cuenta. Otros providers igual muestran contexto, tokens, modelo y thinking.
 
+## Contribuir
+
+Las contribuciones son bienvenidas. Leé [CONTRIBUTING.md](CONTRIBUTING.md) y el [Código de Conducta](CODE_OF_CONDUCT.md). Issues y PRs pueden ser en inglés o español. Reportes de seguridad: [SECURITY.md](SECURITY.md).
+
 ## ⭐ Apoyo
 
 Si esta sidebar te sirve, dejale una estrella al repo. Ayuda a que otras personas de Pi lo encuentren.
