@@ -65,7 +65,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Pinned to a tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.1
 ```
 
 From a local clone:

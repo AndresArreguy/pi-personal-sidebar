@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.1] - 2026-11-17
+
+- **Sub usage**: the 5h/7d reset indicator loses the cramped `↻16:02` glyph for a dimmed `· 16:02`, so it no longer competes with the percentage and does not depend on terminal font fallback.
+
 ## [1.2.0] - 2026-11-17
 
 - **Sub usage**: the monthly credits row is now a progress bar filled by the billing-period spend (`$used/$pool`) instead of the remaining balance. The pool is the remaining credits plus what the billing period already spent, read from `/alpha/usage/summary`; accounts without a billing period keep the remaining-balance fallback.

@@ -73,7 +73,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Fijado a un tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.1
 ```
 
 Desde un clon local:

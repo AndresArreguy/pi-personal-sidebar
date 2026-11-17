@@ -476,7 +476,10 @@ export class PersonalSidebar implements Component {
     if (!window || window.cap <= 0) return `${white(`${label}:`)} ${white(this.state.t("value.na"))}`;
     const percent = clamp(Math.round((window.used / window.cap) * 100), 0, 100);
     const reset = formatClock(window.resetAt);
-    return `${white(`${label}:`)} ${this.bar(percent, barWidth)} ${orange(`${percent}%`)}${reset ? white(` ↻${reset}`) : ""}${percent >= 100 ? this.theme.fg("warning", " ⚠") : ""}`;
+    // The reset is secondary: a dim separator reads cleaner than a rotation
+    // glyph glued to the clock, and it never depends on font fallback.
+    const resetSuffix = reset ? ` ${this.theme.fg("dim", `· ${reset}`)}` : "";
+    return `${white(`${label}:`)} ${this.bar(percent, barWidth)} ${orange(`${percent}%`)}${resetSuffix}${percent >= 100 ? this.theme.fg("warning", " ⚠") : ""}`;
   }
 
   render(width: number): string[] {

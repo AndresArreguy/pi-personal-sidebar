@@ -1,6 +1,6 @@
 {
   "name": "pi-personal-sidebar",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Theme-aware right-side dashboard for Pi: repo, todos, Command Code usage, running subagents and npm cache.",
   "license": "MIT",
   "type": "module",
