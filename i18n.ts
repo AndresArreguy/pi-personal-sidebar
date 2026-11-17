@@ -30,6 +30,7 @@ const es = {
   "label.thinking": "thinking:",
   "label.context": "ctx",
   "label.tokens": "tok",
+  "label.cacheHit": "hit",
   "label.cost": "cost",
 
   "value.loading": "cargando…",
@@ -97,6 +98,7 @@ const en: Record<SidebarStringKey, string> = {
   "label.thinking": "thinking:",
   "label.context": "ctx",
   "label.tokens": "tok",
+  "label.cacheHit": "hit",
   "label.cost": "cost",
 
   "value.loading": "loading…",

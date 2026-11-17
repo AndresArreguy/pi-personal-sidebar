@@ -40,9 +40,10 @@ transcript, el editor y el footer se reacomodan al ancho restante.
   y ruta local.
 - **To-do** — tareas de [`rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo).
   Su overlay propio se oculta para que la lista aparezca una sola vez.
-- **Sub usage** — barras de progreso para la cuota de 5 horas y semanal, uso
-  del context window, tokens y costo de la sesión, más modelo y thinking
-  actuales. La cuota refresca cada 60s; contexto/tokens cada 2s.
+- **Sub usage** — barras de progreso para la cuota de 5 horas, semanal y
+  mensual (la mensual se llena con el gasto del período de facturación), uso
+  del context window, tokens, cache hit y costo de la sesión, más modelo y
+  thinking actuales. La cuota refresca cada 60s; contexto/tokens cada 2s.
 - **Subagentes** — llamadas activas a `run_agent` con agente, preview de la task
   y tiempo transcurrido.
 - **NPM cache** — `[ Limpiar cache NPM ]` ejecuta `npm cache clean --force` y,
@@ -72,7 +73,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Fijado a un tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.1.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.0
 ```
 
 Desde un clon local:
@@ -195,7 +196,8 @@ npm run check       # chequeo de sintaxis (no hay build)
 pi install .        # carga el paquete local
 ```
 
-Después editá `index.ts`, `i18n.ts` o `quota.ts` y corré `/reload` en Pi.
+Después editá `index.ts`, `i18n.ts`, `quota.ts` o `session-usage.ts` y corré
+`npm test` (runner de tests de Node) antes de `/reload` en Pi.
 
 ## Limitaciones
 
@@ -205,7 +207,9 @@ Después editá `index.ts`, `i18n.ts` o `quota.ts` y corré `/reload` en Pi.
 - El progreso de subagentes es agente + task + tiempo. `run_agent` no streamea la
   salida del hijo.
 - Las barras de cuota dependen de la API de Command Code y del plan de la
-  cuenta. Otros providers igual muestran contexto, tokens, modelo y thinking.
+  cuenta. La barra mensual necesita una suscripción con período de facturación;
+  sin eso, la sidebar muestra el saldo de créditos restante. Otros providers
+  igual muestran contexto, tokens, modelo y thinking.
 
 ## Contribuir
 

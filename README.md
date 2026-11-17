@@ -38,7 +38,7 @@ and footer reflow into the remaining width.
 
 - **Repo / Folder** — repository name, branch, dirty file count and local path.
 - **To-do** — tasks from [`rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo). Its own overlay is hidden so the list only appears once.
-- **Sub usage** — progress bars for the 5-hour and weekly quota, context-window usage, session token totals and cost, plus the current model and thinking level. Quota refreshes every 60s; context/tokens every 2s.
+- **Sub usage** — progress bars for the 5-hour, weekly and monthly quota (monthly fills with the billing-period spend), context-window usage, session token totals, cache-hit rate and cost, plus the current model and thinking level. Quota refreshes every 60s; context/tokens every 2s.
 - **Subagents** — active `run_agent` calls with agent name, task preview and elapsed time.
 - **NPM cache** — `[ Clear NPM cache ]` runs `npm cache clean --force` and, when available, `pnpm store prune`. A confirmation dialog is always shown.
 - **Collapsible sections** — bold titles with `▾ / ▸`. Click a title with the mouse, or focus the panel and use the keyboard.
@@ -65,7 +65,7 @@ pi install git:github.com/AndresArreguy/pi-personal-sidebar
 Pinned to a tag:
 
 ```bash
-pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.1.0
+pi install git:github.com/AndresArreguy/pi-personal-sidebar@v1.2.0
 ```
 
 From a local clone:
@@ -188,7 +188,8 @@ npm run check       # syntax check (no build step)
 pi install .        # load the local package
 ```
 
-Then edit `index.ts`, `i18n.ts` or `quota.ts` and run `/reload` in Pi.
+Then edit `index.ts`, `i18n.ts`, `quota.ts` or `session-usage.ts` and run
+`npm test` (Node's test runner) before `/reload` in Pi.
 
 ## Limitations
 
@@ -198,8 +199,10 @@ Then edit `index.ts`, `i18n.ts` or `quota.ts` and run `/reload` in Pi.
   changes the fullscreen layout API may require an update.
 - Subagent progress is agent + task + elapsed time. Live child output is not
   streamed by `run_agent`.
-- Quota bars depend on the Command Code API and the current account plan. Other
-  providers still show context, tokens, model and thinking.
+- Quota bars depend on the Command Code API and the current account plan. The
+  monthly bar needs a subscription with a billing period; without one the
+  sidebar falls back to the remaining credit balance. Other providers still
+  show context, tokens, model and thinking.
 
 ## Contributing
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0] - 2026-11-17
+
+- **Sub usage**: the monthly credits row is now a progress bar filled by the billing-period spend (`$used/$pool`) instead of the remaining balance. The pool is the remaining credits plus what the billing period already spent, read from `/alpha/usage/summary`; accounts without a billing period keep the remaining-balance fallback.
+- **Sub usage**: new cache-hit bar for the current session (`cacheRead / (input + cacheRead + cacheWrite)`), next to the token totals.
+- Session token accounting moved to `session-usage.ts` and covered by tests (`npm test`).
+
 ## [1.1.0] - 2026-11-16
 
 - **Sub usage**: progress bars for the 5h/weekly quota, context-window usage, session token totals and cost.

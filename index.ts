@@ -22,6 +22,12 @@ import type { Component, TUI, TuiMouseEvent, TuiMouseEventResult } from "@earend
 import { HStack, matchesKey, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { fetchQuotaSnapshot, type QuotaSnapshot } from "./quota.ts";
 import {
+  addSessionUsage,
+  cacheHitPercent,
+  emptySessionUsage,
+  type SessionUsage,
+} from "./session-usage.ts";
+import {
   createTranslator,
   isSidebarLanguage,
   languageLabel,
@@ -76,14 +82,6 @@ interface UsageData {
   snapshot: QuotaSnapshot | null;
   error?: string;
   updatedAt: number;
-}
-
-interface SessionUsage {
-  input: number;
-  output: number;
-  cacheRead: number;
-  cacheWrite: number;
-  cost: number;
 }
 
 interface ContextSnapshot {
@@ -192,20 +190,14 @@ function formatClock(ms: number | null): string {
 function formatMoney(value: number | null, fallback = "n/d"): string {
   if (value === null || !Number.isFinite(value)) return fallback;
   if (Number.isInteger(value)) return value.toLocaleString();
-  return value.toFixed(Math.abs(value) >= 10 ? 1 : 2);
+  const text = value.toFixed(Math.abs(value) >= 10 ? 1 : 2);
+  // 69.99 rounds to "70.0"; the trailing zero is only noise in a 40-col panel.
+  return text.endsWith(".0") ? text.slice(0, -2) : text;
 }
 
-function emptySessionUsage(): SessionUsage {
-  return { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0 };
-}
-
-function addSessionUsage(totals: SessionUsage, usage: any): void {
-  if (!usage) return;
-  totals.input += Number(usage.input || 0);
-  totals.output += Number(usage.output || 0);
-  totals.cacheRead += Number(usage.cacheRead || 0);
-  totals.cacheWrite += Number(usage.cacheWrite || 0);
-  totals.cost += typeof usage.cost === "number" ? usage.cost : Number(usage.cost?.total || 0);
+function formatPercent(value: number): string {
+  if (value >= 99.95) return "100%";
+  return `${value.toFixed(1)}%`;
 }
 
 function formatTokens(count: number): string {
@@ -345,11 +337,7 @@ export class PersonalSidebar implements Component {
       } else if (usage.snapshot) {
         this.pushBody(body, this.formatWindow("5h", usage.snapshot.fiveHour, barWidth));
         this.pushBody(body, this.formatWindow("7d", usage.snapshot.weekly, barWidth));
-        const month = usage.snapshot.monthlyRemaining;
-        this.pushBody(
-          body,
-          `${white(this.state.t("label.month"))} ${month === null ? white(this.state.t("value.na")) : orange(formatMoney(month, this.state.t("value.na")))} ${white(this.state.t("label.left"))}`,
-        );
+        this.pushBody(body, this.formatMonthly(usage.snapshot, barWidth, valueWidth));
       } else {
         this.pushBody(body, white(this.state.t("value.loading")));
       }
@@ -376,6 +364,13 @@ export class PersonalSidebar implements Component {
         this.pushBody(body, `${white(`${this.state.t("label.tokens")}:`)} ${white(parts.join(" "))}`);
       } else {
         this.pushBody(body, `${white(`${this.state.t("label.tokens")}:`)} ${white(this.state.t("value.na"))}`);
+      }
+      const hit = cacheHitPercent(totals);
+      if (hit !== null) {
+        this.pushBody(
+          body,
+          `${white(`${this.state.t("label.cacheHit")}:`)} ${this.bar(hit, barWidth, "hit")} ${orange(formatPercent(hit))}`,
+        );
       }
       if (totals.cost > 0) {
         this.pushBody(body, `${white(`${this.state.t("label.cost")}:`)} ${orange(`$${totals.cost.toFixed(3)}`)}`);
@@ -426,11 +421,49 @@ export class PersonalSidebar implements Component {
     return body;
   }
 
-  private bar(percent: number, width: number): string {
+  private bar(percent: number, width: number, mode: "used" | "hit" = "used"): string {
     const safe = clamp(percent, 0, 100);
     const filled = Math.round((safe / 100) * width);
-    const color = safe >= 90 ? "error" : safe >= 70 ? "warning" : "success";
+    // Quota bars warn as they fill; a cache-hit bar is the other way around.
+    const color =
+      mode === "hit"
+        ? safe >= 70
+          ? "success"
+          : safe >= 40
+            ? "warning"
+            : "error"
+        : safe >= 90
+          ? "error"
+          : safe >= 70
+            ? "warning"
+            : "success";
     return this.theme.fg(color, "█".repeat(filled)) + this.theme.fg("dim", "░".repeat(Math.max(0, width - filled)));
+  }
+
+  /**
+   * Monthly credits: the bar fills with the billing-period spend, against the
+   * pool left plus what was already spent. Accounts without a billing period
+   * fall back to the remaining balance, since there is no month to fill.
+   */
+  private formatMonthly(snapshot: QuotaSnapshot, barWidth: number, maxWidth: number): string {
+    const white = (text: string) => this.theme.fg("text", text);
+    const orange = (text: string) => this.theme.fg("mdCode", text);
+    const monthly = snapshot.monthly;
+    if (!monthly) {
+      const remaining = snapshot.monthlyRemaining;
+      return `${white(this.state.t("label.month"))} ${remaining === null ? white(this.state.t("value.na")) : orange(formatMoney(remaining, this.state.t("value.na")))} ${white(this.state.t("label.left"))}`;
+    }
+    const percent = clamp(Math.round((monthly.used / monthly.cap) * 100), 0, 100);
+    const label = white(this.state.t("label.month"));
+    const amounts = white(
+      `$${formatMoney(monthly.used, this.state.t("value.na"))}/$${formatMoney(monthly.cap, this.state.t("value.na"))}`,
+    );
+    // Give the amounts their room first, then let the bar keep whatever is left.
+    const room = maxWidth - visibleWidth(label) - visibleWidth(amounts) - 6; // separators + "NN%"
+    const width = clamp(Math.min(barWidth, room), 3, barWidth);
+    const head = `${label} ${this.bar(percent, width)} ${orange(`${percent}%`)}`;
+    const withAmounts = `${head} ${amounts}`;
+    return visibleWidth(withAmounts) <= maxWidth ? withAmounts : head;
   }
 
   private formatWindow(

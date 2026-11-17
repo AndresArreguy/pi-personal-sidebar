@@ -1,6 +1,6 @@
 {
   "name": "pi-personal-sidebar",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Theme-aware right-side dashboard for Pi: repo, todos, Command Code usage, running subagents and npm cache.",
   "license": "MIT",
   "type": "module",
@@ -34,6 +34,7 @@
     "index.ts",
     "i18n.ts",
     "quota.ts",
+    "session-usage.ts",
     "README.md",
     "README.es.md",
     "CHANGELOG.md",
@@ -43,7 +44,8 @@
     "SECURITY.md"
   ],
   "scripts": {
-    "check": "node --experimental-strip-types --check index.ts && node --experimental-strip-types --check i18n.ts && node --experimental-strip-types --check quota.ts"
+    "check": "node --experimental-strip-types --check index.ts && node --experimental-strip-types --check i18n.ts && node --experimental-strip-types --check quota.ts && node --experimental-strip-types --check session-usage.ts",
+    "test": "node --test --experimental-strip-types"
   },
   "pi": {
     "extensions": [
